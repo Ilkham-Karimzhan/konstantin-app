@@ -51,10 +51,14 @@ const search = ref<string>('')
         </ul>
         <ul class='social-list flex gap-3 items-center mr-[66.5px] text-4xl'>
           <li>
-            <instagram-icon filled />
+            <a href='https://www.instagram.com/_k5er0ks_/'>
+              <instagram-icon filled />
+            </a>
           </li>
           <li>
-            <vk-icon filled />
+            <a href='https://vk.com/pchelx'>
+              <vk-icon filled />
+            </a>
           </li>
           <li>
             <facebook-icon filled />

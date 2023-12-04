@@ -25,7 +25,10 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.6.1",
+    "install": "^0.13.0",
+    "pinia": "^2.1.7",
     "vue3-carousel-nuxt": "^1.1.0"
   }
 }

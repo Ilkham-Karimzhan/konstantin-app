@@ -2,6 +2,10 @@
 import KButton from '@/components/ui/k-button/index.vue'
 import KSlider from '@/components/slider/index.vue'
 import ArrowRight from '~/components/ui/k-button/arrow-right.vue'
+
+useHead({
+  title: 'Главная - InstRoom'
+})
 </script>
 <template>
   <section class='bg-[#212526]'>
@@ -40,9 +44,15 @@ import ArrowRight from '~/components/ui/k-button/arrow-right.vue'
       </div>
     </div>
   </section>
-  <section class='bg-[#f2f5f7] py-[82px]'>
+  <section class='flex flex-col gap-[74px] py-[82px]'>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider />
+      <k-slider items-to-show='4' title='Малярные товары' />
+    </div>
+    <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
+      <k-slider items-to-show='4' title='Спецодежда' />
+    </div>
+    <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
+      <k-slider items-to-show='4' title='Сезонное' />
     </div>
   </section>
 </template>
