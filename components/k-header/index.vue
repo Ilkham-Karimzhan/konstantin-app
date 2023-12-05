@@ -6,7 +6,15 @@ import CartIcon from '@/shared/icons/cart.svg'
 import Navigation from '~/components/k-header/ui/navigation.vue'
 import Modal from '~/components/ui/modal/index.vue'
 
+const client = useSupabaseClient()
+
 const isOpen = ref<boolean>(false)
+
+const { data } = await useAsyncData('goods', async () => {
+  const { data } = await client.from('Goods').select()
+  return data
+})
+console.log(data.value)
 </script>
 <template>
   <header class='bg-[#212526]'>
