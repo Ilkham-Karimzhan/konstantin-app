@@ -15,5 +15,6 @@ interface Product {
     diluent: string;
     flow: string;
     weight: string;
+    src: string
   };
 }

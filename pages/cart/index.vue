@@ -8,6 +8,9 @@ useHead({
 })
 
 const isOpen = ref<boolean>(false)
+
+const store = useCartStore()
+const {cartItems} = storeToRefs(store)
 </script>
 <template>
   <div class='py-6 max-w-[1300px] my-0 mx-auto'>
@@ -29,22 +32,14 @@ const isOpen = ref<boolean>(false)
         </tr>
         </thead>
         <tbody>
-        <item v-for='item in 6' :key='item' />
+        <item v-for='(item, idx) in cartItems' :key='idx' :item="item" />
         </tbody>
       </table>
     </div>
     <div class='ml-[auto] flex flex-col gap-5 w-[310px]'>
       <div class='flex justify-between pb-5 border-b border-[#DEDBDB]'>
-        <p>Сумма</p>
-        <p>4 550 ₽</p>
-      </div>
-      <div class='flex justify-between pb-5 border-b border-[#DEDBDB]'>
-        <p class='text-base text-[#8A8A8A]'>Скидка</p>
-        <p class='text-base text-[#8A8A8A]'>— 250 ₽</p>
-      </div>
-      <div class='flex justify-between pb-5 border-b border-[#DEDBDB]'>
         <p class='text-xl font-bold'>К оплате</p>
-        <p class='text-xl font-bold text-[#F05A00]'>4 200 ₽</p>
+        <p class='text-xl font-bold text-[#F05A00]'>{{cartItems.reduce((acc, i) => acc + i.price, 0)}}₽</p>
       </div>
       <k-button data-modal-target='popup-modal' data-modal-toggle='popup-modal' @click='isOpen = true'>ПЕРЕЙТИ
         К ОФОРМЛЕНИЮ

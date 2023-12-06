@@ -4,14 +4,18 @@ import MinusIcon from '~/shared/icons/minus.svg'
 import XIcon from '~/shared/icons/x.svg'
 
 const count = ref<number>(1)
-const item = ref<Product>({} as Product)
+defineProps<{
+   item: Product
+}>()
 
-
+const cartStore = useCartStore();
+const {cartItems} = storeToRefs(cartStore)
+const {deleteFromCart} = cartStore
 </script>
 <template>
   <tr class='bg-white'>
     <td class='flex gap-[81px]'>
-      <img alt='item' src='@/shared/assets/item4.png'>
+      <NuxtImg width="60px" height="60px" alt='item' :src='item.description.src' />
       <p class='flex flex-col gap-1'>
         <span class='text-sm text-[#8A8A8A] transition cursor-pointer hover:text-[#F05A00]'>{{ item.description.type
           }}</span>
@@ -33,19 +37,23 @@ const item = ref<Product>({} as Product)
                  :style='{ width: `${count.toString().length * 10}px` }'
                  type='text'>
         </span>
-        <span @click='count <= item.count ? count++ : count;'><PlusIcon :class='{"text-red": count === item.count }'
-                                                                        class='cursor-pointer text-2xl'
-                                                                        filled /> </span>
+        <span @click='count <= item.count ? count++ : count;'>
+         <PlusIcon 
+         :class='{"text-red": count === item.count }'
+         class='cursor-pointer text-2xl'
+         filled 
+         /> 
+      </span>
       </div>
     </td>
     <td>
       <p class='relative text-base font-medium'>
-        {{ 500 * count }} ₽
+        {{ item.price * count }} ₽
       </p>
     </td>
     <td class='w-[24px]'>
-      <button>
-        <x-icon class='text-2xl' filled />
+      <button @click="deleteFromCart(item)">
+        <x-icon class='orange text-2xl'  filled />
       </button>
     </td>
   </tr>
@@ -57,5 +65,10 @@ td:first-child {
 
 td:last-child {
   padding: 14px 20px;
+}
+.orange {
+   &:hover {
+      filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
+   }
 }
 </style>

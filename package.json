@@ -25,7 +25,9 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@nuxt/image": "^1.1.0",
     "@pinia/nuxt": "^0.5.1",
+    "@vueuse/core": "^10.7.0",
     "@vueuse/nuxt": "^10.6.1",
     "install": "^0.13.0",
     "pinia": "^2.1.7",

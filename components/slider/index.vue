@@ -9,11 +9,16 @@ defineOptions({ name: 'KSlider' })
 
 const slider = ref(null)
 
-defineProps<{
+const props = defineProps<{
   title: string
   itemsToShow: number
-  items: object[]
+  items: Product[]
+  filter: string
 }>()
+
+const filteredItems = computed(() => {
+   return props.items.filter((i) => i.description.type === props.filter)
+})
 </script>
 <template>
   <div class='flex items-center gap-[60px] mb-5'>
@@ -32,9 +37,11 @@ defineProps<{
       </button>
     </div>
   </div>
-  <Carousel ref='slider' :itemsToShow='itemsToShow' :mouseDrag='false' snapAlign='start'>
-    <Slide v-for='slide in 10' :key='slide'>
-      <card />
+  <div class="w-full">
+   <Carousel ref='slider' :itemsToShow='itemsToShow' :mouseDrag='false' snapAlign='start'>
+    <Slide v-for='slide in filteredItems' :key='slide'>
+      <card :item="slide" />
     </Slide>
   </Carousel>
+  </div>
 </template>

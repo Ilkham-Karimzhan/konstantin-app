@@ -6,6 +6,13 @@ import ArrowRight from '~/components/ui/k-button/arrow-right.vue'
 useHead({
   title: 'Главная - InstRoom'
 })
+
+const client = useSupabaseClient()
+
+const { data } = await useAsyncData('goods', async () => {
+  const { data } = await client.from('Goods').select('*')
+  return data  
+})
 </script>
 <template>
   <section class='bg-[#212526]'>
@@ -43,16 +50,16 @@ useHead({
         </div>
       </div>
     </div>
-  </section>
+  </section>   
   <section class='flex flex-col gap-[74px] py-[82px]'>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider items-to-show='4' title='Малярные товары' />
+      <k-slider :items-to-show='4' title='Малярные товары' filter="Малярные товары" :items="data.concat(data).concat(data)" />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider items-to-show='4' title='Спецодежда' />
+      <k-slider :items-to-show='4' title='Спецодежда' :items="data.concat(data).concat(data)" filter="Сезонное" />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider items-to-show='4' title='Сезонное' />
+      <k-slider :items-to-show='4' title='Сезонное' :items="data.concat(data).concat(data).concat(data)" filter="Спецодежда" />
     </div>
   </section>
 </template>

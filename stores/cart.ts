@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia'
+import { useStorage } from '@vueuse/core'
 
-const useCartStore = defineStore('cart', () => {
-  const cart = ref([])
+export const useCartStore = defineStore('cart', () => {
+   const cartItems = useStorage('cart', []) 
 
-  const addToCart = (product) => {
-    cart.value.push(product)
+  const addToCart = (product: Product): void => {
+   cartItems.value.push(product)
   }
-  const deleteFromCart = (product) => {
-    cart.value.splice(cart.value.indexOf(product), 1)
+  const deleteFromCart = (product: Product): void => {
+   cartItems.value.splice(cartItems.value.indexOf(product), 1)
   }
 
 
-  return { cart, addToCart }
+  return { cartItems, addToCart, deleteFromCart }
 })

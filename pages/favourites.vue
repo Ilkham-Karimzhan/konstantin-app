@@ -4,6 +4,9 @@ import Card from '~/components/slider/ui/card.vue'
 useHead({
   title: 'Избранные товары'
 })
+
+const favouritesStore = useFavouritesStore()
+const {likedItems} = storeToRefs(favouritesStore)
 </script>
 <template>
   <div class='py-6 max-w-[1300px] my-0 mx-auto'>
@@ -14,9 +17,9 @@ useHead({
     </p>
     <h2 class='text-[40px] font-bold mb-8 leading-[48px]'>Избранное</h2>
     <div class='flex flex-col gap-6'>
-      <p class='text-base font-medium'>15 товаров</p>
+      <p class='text-base font-medium'>Количество товаров: {{ likedItems.length }}</p>
       <div class='flex flex-wrap gap-5'>
-        <card v-for='item in 10' :key='item' />
+        <card v-for='(item, idx) in likedItems' :key='idx' :item="item" />
       </div>
     </div>
   </div>
