@@ -3,6 +3,8 @@ import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 import KButton from '~/components/ui/k-button/index.vue'
 import HeartIcon from '@/shared/icons/heart.svg'
 import ChartIcon from '@/shared/icons/chart.svg'
+import { client } from '~/helpers/useClient'
+import { useCartStore } from '~/stores/cart'
 
 useHead({
   title: 'Товар - №123'
@@ -11,8 +13,26 @@ useHead({
 const route = useRoute()
 const id = route.params.id
 
+const store = useCartStore()
+const { storeCartItems } = storeToRefs(store)
+const { addToCartStore, deleteFromCartStore } = store
+
 const links: string[] = ['Описание', 'Характеристики', 'Доставка', 'Отзывы']
 const currentLink = ref<string>(links[0])
+
+const { data } = await useAsyncData('goods', async () => {
+  const { data } = await client.from('Goods').select('*').eq('id', id)
+  return data
+})
+
+const addToCart = async (item: Product) => {
+  const { error } = await client.from('Cart').insert(item)
+  addToCartStore(item)
+  console.warn(error)
+}
+
+const item: Product = await data.value[0]
+const activeImg = ref<number>(0)
 </script>
 <template>
   <div class='py-6 max-w-[1300px] my-0 mx-auto'>
@@ -25,30 +45,29 @@ const currentLink = ref<string>(links[0])
     </p>
     <div class='flex justify-between gap-[104px] bg-white p-[60px]  mb-0.5 rounded-[5px]'>
       <div class='flex flex-col max-w-[514px] items-center'>
-        <Carousel ref='slider' snapAlign='start'>
-          <Slide v-for='slide in 5' :key='slide'>
-            <img alt='item' src='@/shared/assets/item3.png'>
+        <Carousel ref='slider' v-model='activeImg' snapAlign='start'>
+          <Slide v-for='img in item.description.src' :key='img'>
+            <img :src='img' alt='item'>
           </Slide>
         </Carousel>
         <div class='flex gap-4 justify-center'>
-          <div v-for='item in 5' :key='item' class='item w-[90px]'>
-            <img alt='item' src='@/shared/assets/item3.png'>
+          <div v-for='(img, idx) in item.description.src' :key='idx' class='item w-[90px]'>
+            <img :src='img' alt='item' @click='activeImg = idx'>
           </div>
         </div>
       </div>
       <div class='flex flex-col items-start'>
         <div class='flex flex-col gap-5 mb-[60px]'>
-          <h3 class='text-[30px] font-bold'>Краска Farbitex Для садовых деревьев</h3>
-          <p class='text-base text-[#126935]'>В наличии</p>
-          <p class='text-base max-w-[388px]'>Быстросохнущая, высокоукрывистая, защита от водорослей, мха, лишайника,
-            защита от грибка,
-            светостойкая,
-            термостойкая, защита от вредителей</p>
+          <h3 class='text-[30px] font-bold'>{{ item.name }}</h3>
+          <p v-if='item.count > 0' class='text-base text-[#126935]'>В наличии</p>
+          <p class='text-base max-w-[388px]'>{{ item.description.colour }}</p>
         </div>
-        <p class='flex gap-[15px] items-center mb-[60px]'><span class='text-[30px] leading-[32px]'>500 ₽</span><span
-          class='text-base text-[#8A8A8A] line-through'>720 ₽</span></p>
+        <p class='flex gap-[15px] items-center mb-[60px]'><span
+          class='text-[30px] leading-[32px]'>{{ item.price }}₽</span></p>
         <div class='flex gap-4'>
-          <k-button>В КОРЗИНУ</k-button>
+          <k-button v-if='storeCartItems.some((i) => i.id === item.id)' @click='deleteFromCartStore'>В КОРЗИНЕ
+          </k-button>
+          <k-button v-else @click='addToCart(item)'>В КОРЗИНУ</k-button>
           <chart-icon class='icon-black text-[45px]' filled />
           <HeartIcon class='icon-black text-[45px]' filled />
         </div>
@@ -62,11 +81,11 @@ const currentLink = ref<string>(links[0])
         </li>
       </ul>
       <ul v-if="currentLink === 'Описание'" class='flex flex-col gap-3'>
-        <li><span class='text-base font-medium mr-6 '>Расход:</span> от 0,15 до 0,18 кг/м2</li>
-        <li><span class='text-base font-medium mr-6 '>Назначение:</span> Для деревьев</li>
-        <li><span class='text-base font-medium mr-6 '>Тип работ:</span> Наружное</li>
-        <li><span class='text-base font-medium mr-6 '>Упаковка:</span> Ведро</li>
-        <li><span class='text-base font-medium mr-6 '>Время высыхания:</span> 1ч</li>
+        <li><span class='text-base font-medium mr-6 '>Расход:</span> {{ item.description.flow }}</li>
+        <li><span class='text-base font-medium mr-6 '>Назначение:</span>{{ item.description.assignment }}</li>
+        <li><span class='text-base font-medium mr-6 '>Тип работ:</span>{{ item.description.type_of_operation }}</li>
+        <!--        <li><span class='text-base font-medium mr-6 '>Упаковка:</span>{{ item.description.base }}</li>-->
+        <!--        <li><span class='text-base font-medium mr-6 '>Время высыхания:</span>{{ item.description. }}</li>-->
       </ul>
       <div v-else>Страница находится в разработке. Приносим свои извинения.</div>
     </div>

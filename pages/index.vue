@@ -2,16 +2,18 @@
 import KButton from '@/components/ui/k-button/index.vue'
 import KSlider from '@/components/slider/index.vue'
 import ArrowRight from '~/components/ui/k-button/arrow-right.vue'
+import { client } from '~/helpers/useClient'
+
 
 useHead({
   title: 'Главная - InstRoom'
 })
 
-const client = useSupabaseClient()
-
-const { data } = await useAsyncData('goods', async () => {
+const items = ref<Product[]>([])
+const { data } = useAsyncData('goods', async () => {
   const { data } = await client.from('Goods').select('*')
-  return data  
+  items.value = data
+  return data
 })
 </script>
 <template>
@@ -50,16 +52,23 @@ const { data } = await useAsyncData('goods', async () => {
         </div>
       </div>
     </div>
-  </section>   
+  </section>
   <section class='flex flex-col gap-[74px] py-[82px]'>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :items-to-show='4' title='Малярные товары' filter="Малярные товары" :items="data.concat(data).concat(data)" />
+      <k-slider :client='client' :items='data.concat(data).concat(data)' :items-to-show='4' filter='Малярные товары'
+                title='Малярные товары'
+      />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :items-to-show='4' title='Спецодежда' :items="data.concat(data).concat(data)" filter="Сезонное" />
+      <k-slider :client='client' :items='data.concat(data).concat(data)' :items-to-show='4' filter='Сезонное'
+                title='Спецодежда'
+      />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :items-to-show='4' title='Сезонное' :items="data.concat(data).concat(data).concat(data)" filter="Спецодежда" />
+      <k-slider :client='client' :items='data.concat(data).concat(data).concat(data)' :items-to-show='4'
+                filter='Спецодежда'
+                title='Сезонное'
+      />
     </div>
   </section>
 </template>

@@ -6,62 +6,76 @@ import ChartIcon from '@/shared/icons/chart.svg'
 import CheckIcon from '@/shared/icons/check.svg'
 import CartIcon from '@/shared/icons/cart.svg'
 import CheckCircleIcon from '@/shared/icons/check-circle.svg'
+import { useCartStore } from '~/stores/cart'
 
-const cartStore = useCartStore();
-const {cartItems} = storeToRefs(cartStore)
-const {addToCart, deleteFromCart} = cartStore
+const cartItems = ref<Product[]>([])
+const store = useCartStore()
+const { storeCartItems } = storeToRefs(store)
+const { addToCartStore, deleteFromCartStore } = store
 
-const favouritesStore = useFavouritesStore()
-const {likedItems} = storeToRefs(favouritesStore)
-const {addToLiked, deleteFromLiked} = favouritesStore
+const deleteFromCart = async (item: Product) => {
+  const { error } = await props.client.from('Cart').delete().eq('id', item.id)
+  addToCartStore(item)
+  console.warn(error)
+}
+const addToCart = async (item: Product) => {
+  const { error } = await props.client.from('Cart').insert(item)
+  deleteFromCartStore(item)
+  console.warn(error)
+}
 
-defineOptions({ name: 'SwiperCard' })
-defineProps<{
-   item: Product
+const props = defineProps<{
+  item: Product
+  client: object
 }>()
+
 </script>
 <template>
   <div class='relative flex flex-col max-w-[310px] p-[12px] bg-white rounded-[5px] mb-[4px]'>
     <div class='flex justify-between'>
       <span v-if='false' class='py-1 px-1.5 bg-[#180A3E] text-white text-sm'>Новинка</span>
-      <span v-else-if="item.on_sale" class='py-1 px-1.5 bg-[#FC573B] text-white text-sm'>Акция</span>
+      <span v-else-if='item.on_sale' class='py-1 px-1.5 bg-[#FC573B] text-white text-sm'>Акция</span>
       <div class='flex gap-2'>
-        <heart-filled-icon v-if="likedItems.some((i) => i.id === item.id)" @click="deleteFromLiked(item)" class="text-[24px] cursor-pointer" filled />
-        <heart-icon v-else @click="addToLiked(item)" class='gray-icon' filled />
-        <chart-icon class='gray-icon' filled />
+        <!--        <heart-filled-icon v-if='likedItems.some((i) => i.id === item.id)' class='text-[24px] cursor-pointer'-->
+        <!--                           filled @click='deleteFromLiked(item)' />-->
+        <!--        <heart-icon v-else class='gray-icon' filled @click='addToLiked(item)' />-->
+        <!--        <chart-icon class='gray-icon' filled />-->
       </div>
     </div>
     <Carousel ref='slider'>
-      <Slide v-for='slide in 2' :key='slide'>
-         <NuxtImg class="w-[200px] h-[164px]" alt='item' :src='item.description.src' />
+      <Slide v-for='(slide, idx) in item.description.src' :key='idx'>
+        <NuxtImg :src='slide' alt='item' class='w-[200px] h-[164px]' />
+      </Slide>
+      <Slide v-for='(slide, idx) in item.description.src' :key='idx'>
+        <NuxtImg :src='slide' alt='item' class='w-[200px] h-[164px]' />
       </Slide>
       <template #addons>
         <Pagination />
       </template>
     </Carousel>
-    <p class='text-base font-medium text-left mt-[14px] mb-[12px]'>{{item.name}}<br> {{item.description.weight}}</p>
+    <p class='text-base font-medium text-left mt-[14px] mb-[12px]'>{{ item.name }}<br> {{ item.description.weight }}</p>
     <div class='flex justify-start gap-[34px] items-center'>
       <div class='flex gap-2.5'>
-        <span class='text-xl font-semibold'>{{item.price}}₽</span>
-        <span v-if="item.on_sale" class='text-xl text-[#DEDBDB] line-through'></span>
+        <span class='text-xl font-semibold'>{{ item.price }}₽</span>
+        <span v-if='item.on_sale' class='text-xl text-[#DEDBDB] line-through'></span>
       </div>
       <span class='flex items-center gap-1 text-sm text-[#126935] leading-[16px]'>
-        <span v-if="item.count !== 0" class='h-4'>
+        <span v-if='item.count !== 0' class='h-4'>
           <check-icon filled />
-        </span> 
+        </span>
         в наличии
       </span>
     </div>
     <button
-      v-if="cartItems.some((i) => i.id === item.id)"
-      @click="deleteFromCart(item)"
-      class='white-button absolute bottom-0 right-0 py-3 px-3.5 border border-[#F05A00] hover:bg-white bg-[#F05A00] hover:bg-[#F05A00] transition rounded-tl-[5px] rounded-br-[5px]'>
+      v-if='storeCartItems.some((i) => i.id === item.id)'
+      class='white-button absolute bottom-0 right-0 py-3 px-3.5 border border-[#F05A00] hover:bg-white bg-[#F05A00] hover:bg-[#F05A00] transition rounded-tl-[5px] rounded-br-[5px]'
+      @click='deleteFromCart(item)'>
       <check-circle-icon class='white-cart text-[32px]' filled />
     </button>
     <button
       v-else
-      @click="addToCart(item)"
-      class='absolute bottom-0 right-0 py-3 px-3.5 border border-[#F05A00] hover:bg-[#F05A00] transition rounded-tl-[5px] rounded-br-[5px]'>
+      class='absolute bottom-0 right-0 py-3 px-3.5 border border-[#F05A00] hover:bg-[#F05A00] transition rounded-tl-[5px] rounded-br-[5px]'
+      @click='addToCart(item)'>
       <cart-icon class='orange-cart text-[32px]' filled />
     </button>
   </div>
@@ -76,8 +90,9 @@ button:has(.orange-cart):hover {
 .orange-cart {
   filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
 }
+
 .white-button:hover .white-cart {
-   filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
 }
 
 .gray-icon {

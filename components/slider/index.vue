@@ -14,10 +14,11 @@ const props = defineProps<{
   itemsToShow: number
   items: Product[]
   filter: string
+  client: object
 }>()
 
 const filteredItems = computed(() => {
-   return props.items.filter((i) => i.description.type === props.filter)
+  return props.items.filter((i) => i.description.type === props.filter)
 })
 </script>
 <template>
@@ -37,11 +38,11 @@ const filteredItems = computed(() => {
       </button>
     </div>
   </div>
-  <div class="w-full">
-   <Carousel ref='slider' :itemsToShow='itemsToShow' :mouseDrag='false' snapAlign='start'>
-    <Slide v-for='slide in filteredItems' :key='slide'>
-      <card :item="slide" />
-    </Slide>
-  </Carousel>
+  <div class='w-full'>
+    <Carousel ref='slider' :itemsToShow='itemsToShow' :mouseDrag='false' snapAlign='start'>
+      <Slide v-for='slide in filteredItems' :key='slide'>
+        <card :client='client' :item='slide' @update="$emit('update')" />
+      </Slide>
+    </Carousel>
   </div>
 </template>

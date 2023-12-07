@@ -5,17 +5,27 @@ import XIcon from '~/shared/icons/x.svg'
 
 const count = ref<number>(1)
 defineProps<{
-   item: Product
+  item: Product
 }>()
 
-const cartStore = useCartStore();
-const {cartItems} = storeToRefs(cartStore)
-const {deleteFromCart} = cartStore
+const emit = defineEmits('update')
+const client = useSupabaseClient()
+
+const { data } = await useAsyncData('goods', async () => {
+  const { data } = await client.from('Cart').select('*')
+  return data
+})
+
+const deleteFromCart = async (item: Product) => {
+  const { error } = await client.from('Cart').delete().eq('id', item.id)
+  emit('update')
+  console.warn(error)
+}
 </script>
 <template>
   <tr class='bg-white'>
     <td class='flex gap-[81px]'>
-      <NuxtImg width="60px" height="60px" alt='item' :src='item.description.src' />
+      <NuxtImg :src='item.description.src[0]' alt='item' height='60px' width='60px' />
       <p class='flex flex-col gap-1'>
         <span class='text-sm text-[#8A8A8A] transition cursor-pointer hover:text-[#F05A00]'>{{ item.description.type
           }}</span>
@@ -38,11 +48,11 @@ const {deleteFromCart} = cartStore
                  type='text'>
         </span>
         <span @click='count <= item.count ? count++ : count;'>
-         <PlusIcon 
-         :class='{"text-red": count === item.count }'
-         class='cursor-pointer text-2xl'
-         filled 
-         /> 
+         <PlusIcon
+           :class='{"text-red": count === item.count }'
+           class='cursor-pointer text-2xl'
+           filled
+         />
       </span>
       </div>
     </td>
@@ -52,8 +62,8 @@ const {deleteFromCart} = cartStore
       </p>
     </td>
     <td class='w-[24px]'>
-      <button @click="deleteFromCart(item)">
-        <x-icon class='orange text-2xl'  filled />
+      <button @click='deleteFromCart(item)'>
+        <x-icon class='orange text-2xl' filled />
       </button>
     </td>
   </tr>
@@ -66,9 +76,10 @@ td:first-child {
 td:last-child {
   padding: 14px 20px;
 }
+
 .orange {
-   &:hover {
-      filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
-   }
+  &:hover {
+    filter: brightness(0) saturate(100%) invert(41%) sepia(99%) saturate(3572%) hue-rotate(10deg) brightness(102%) contrast(102%);
+  }
 }
 </style>

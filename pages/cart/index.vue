@@ -2,15 +2,22 @@
 import Modal from '~/components/ui/modal/index.vue'
 import Item from '~/pages/cart/ui/item.vue'
 import KButton from '~/components/ui/k-button/index.vue'
+import { client } from '~/helpers/useClient'
 
 useHead({
   title: 'Корзина'
 })
 
 const isOpen = ref<boolean>(false)
-
-const store = useCartStore()
-const {cartItems} = storeToRefs(store)
+const cartItems = ref<Product[]>([])
+const getItems = async () => {
+  await useAsyncData('goods', async () => {
+    const { data } = await client.from('Cart').select('*')
+    cartItems.value = data
+    return data
+  })
+}
+getItems()
 </script>
 <template>
   <div class='py-6 max-w-[1300px] my-0 mx-auto'>
@@ -32,14 +39,14 @@ const {cartItems} = storeToRefs(store)
         </tr>
         </thead>
         <tbody>
-        <item v-for='(item, idx) in cartItems' :key='idx' :item="item" />
+        <item v-for='(item, idx) in cartItems' :key='idx' :item='item' @update='getItems' />
         </tbody>
       </table>
     </div>
     <div class='ml-[auto] flex flex-col gap-5 w-[310px]'>
       <div class='flex justify-between pb-5 border-b border-[#DEDBDB]'>
         <p class='text-xl font-bold'>К оплате</p>
-        <p class='text-xl font-bold text-[#F05A00]'>{{cartItems.reduce((acc, i) => acc + i.price, 0)}}₽</p>
+        <p class='text-xl font-bold text-[#F05A00]'>{{ cartItems?.reduce((acc, i: Product) => acc + i.price, 0) }}₽</p>
       </div>
       <k-button data-modal-target='popup-modal' data-modal-toggle='popup-modal' @click='isOpen = true'>ПЕРЕЙТИ
         К ОФОРМЛЕНИЮ
