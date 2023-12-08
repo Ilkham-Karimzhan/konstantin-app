@@ -57,7 +57,7 @@ const deleteFromCart = async (item: Product) => {
     </td>
     <td>
       <p class='relative text-base font-medium'>
-        {{ item.price * count }} ₽
+        {{ item.price }} ₽
       </p>
     </td>
     <td class='w-[24px]'>
