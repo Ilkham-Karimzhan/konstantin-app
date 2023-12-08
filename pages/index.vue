@@ -3,6 +3,7 @@ import KButton from '@/components/ui/k-button/index.vue'
 import KSlider from '@/components/slider/index.vue'
 import ArrowRight from '~/components/ui/k-button/arrow-right.vue'
 import { client } from '~/helpers/useClient'
+import { useCartStore } from '~/stores/cart'
 
 
 useHead({
@@ -10,11 +11,22 @@ useHead({
 })
 
 const items = ref<Product[]>([])
-const { data } = useAsyncData('goods', async () => {
-  const { data } = await client.from('Goods').select('*')
-  items.value = data
-  return data
-})
+const getGoods = async () => {
+  const { data } = await useAsyncData('goods', async () => {
+    const { data } = await client.from('Goods').select('*')
+    return data
+  })
+  if (data.value) {
+    items.value = data.value
+  }
+  console.log(data.value)
+}
+getGoods()
+
+const store = useCartStore()
+const { storeCartItems } = storeToRefs(store)
+const { getItems } = store
+storeCartItems.value = await getItems()
 </script>
 <template>
   <section class='bg-[#212526]'>
@@ -55,17 +67,18 @@ const { data } = useAsyncData('goods', async () => {
   </section>
   <section class='flex flex-col gap-[74px] py-[82px]'>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :client='client' :items='data.concat(data).concat(data)' :items-to-show='4' filter='Малярные товары'
+      <k-slider :client='client' :items='items?.concat(items)?.concat(items)' :items-to-show='4'
+                filter='Малярные товары'
                 title='Малярные товары'
       />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :client='client' :items='data.concat(data).concat(data)' :items-to-show='4' filter='Сезонное'
+      <k-slider :client='client' :items='items?.concat(items)?.concat(items)' :items-to-show='4' filter='Сезонное'
                 title='Спецодежда'
       />
     </div>
     <div class='gap-5 max-w-[1300px] my-0 mx-auto'>
-      <k-slider :client='client' :items='data.concat(data).concat(data).concat(data)' :items-to-show='4'
+      <k-slider :client='client' :items='items?.concat(items)?.concat(items)?.concat(items)' :items-to-show='4'
                 filter='Спецодежда'
                 title='Сезонное'
       />

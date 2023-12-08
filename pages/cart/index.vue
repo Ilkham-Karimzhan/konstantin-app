@@ -11,11 +11,11 @@ useHead({
 const isOpen = ref<boolean>(false)
 const cartItems = ref<Product[]>([])
 const getItems = async () => {
-  await useAsyncData('goods', async () => {
+  const { data } = await useAsyncData('goods', async () => {
     const { data } = await client.from('Cart').select('*')
-    cartItems.value = data
     return data
   })
+  cartItems.value = data.value
 }
 getItems()
 </script>
@@ -46,7 +46,8 @@ getItems()
     <div class='ml-[auto] flex flex-col gap-5 w-[310px]'>
       <div class='flex justify-between pb-5 border-b border-[#DEDBDB]'>
         <p class='text-xl font-bold'>К оплате</p>
-        <p class='text-xl font-bold text-[#F05A00]'>{{ cartItems?.reduce((acc, i: Product) => acc + i.price, 0) }}₽</p>
+        <p class='text-xl font-bold text-[#F05A00]'>
+          {{ cartItems.length > 0 ? cartItems?.reduce((acc, i: Product) => acc + i.price, 0) : 0 }}₽</p>
       </div>
       <k-button data-modal-target='popup-modal' data-modal-toggle='popup-modal' @click='isOpen = true'>ПЕРЕЙТИ
         К ОФОРМЛЕНИЮ

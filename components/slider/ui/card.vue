@@ -1,28 +1,24 @@
 <script lang='ts' setup>
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
-import HeartIcon from '@/shared/icons/heart.svg'
-import HeartFilledIcon from '@/shared/icons/heartFilled.svg'
-import ChartIcon from '@/shared/icons/chart.svg'
 import CheckIcon from '@/shared/icons/check.svg'
 import CartIcon from '@/shared/icons/cart.svg'
 import CheckCircleIcon from '@/shared/icons/check-circle.svg'
 import { useCartStore } from '~/stores/cart'
 
-const cartItems = ref<Product[]>([])
-const store = useCartStore()
-const { storeCartItems } = storeToRefs(store)
-const { addToCartStore, deleteFromCartStore } = store
-
 const deleteFromCart = async (item: Product) => {
+  deleteFromCartStore(item)
   const { error } = await props.client.from('Cart').delete().eq('id', item.id)
-  addToCartStore(item)
   console.warn(error)
 }
 const addToCart = async (item: Product) => {
+  addToCartStore(item)
   const { error } = await props.client.from('Cart').insert(item)
-  deleteFromCartStore(item)
   console.warn(error)
 }
+
+const store = useCartStore()
+const { storeCartItems } = storeToRefs(store)
+const { addToCartStore, deleteFromCartStore, getItems } = store
 
 const props = defineProps<{
   item: Product

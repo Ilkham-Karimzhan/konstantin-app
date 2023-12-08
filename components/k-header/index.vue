@@ -5,8 +5,11 @@ import UserIcon from '@/shared/icons/user.svg'
 import CartIcon from '@/shared/icons/cart.svg'
 import Navigation from '~/components/k-header/ui/navigation.vue'
 import Modal from '~/components/ui/modal/index.vue'
+import { useCartStore } from '~/stores/cart'
 
 const isOpen = ref<boolean>(false)
+const store = useCartStore()
+const { storeCartItems } = storeToRefs(store)
 </script>
 <template>
   <header class='bg-[#212526]'>
@@ -49,7 +52,8 @@ const isOpen = ref<boolean>(false)
           </ul>
           <p class='flex flex-col text-white'>
             <span>Товаров на сумму</span>
-            <span class='font-bold'>2 000 ₽</span>
+            <span class='font-bold'>{{ storeCartItems ? storeCartItems.reduce((acc, i) => acc + i.price, 0) : 0
+              }} ₽</span>
           </p>
         </div>
       </div>
